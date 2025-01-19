@@ -26,6 +26,8 @@ let blinkingStartTime = null;
 
 Screen.display(() => {
     const currentTime = Date.now();
+    
+
 
     if (currentTime - folderStartTime < folderDuration) {
        
