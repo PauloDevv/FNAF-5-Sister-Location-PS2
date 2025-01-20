@@ -1,37 +1,40 @@
-const font = new Font("default");
-
-const elevatorFrames = [];
-for (let i = 1; i <= 10; i++) {
-    const frame = new Image(`Source/Elevator/Elevator/${i}.png`);
-    frame.width = 840;
-    frame.height = 648;
-    elevatorFrames.push(frame);
-}
-
-const redImage = new Image("Source/Elevator/Elevator/red.png");
-redImage.width = 840;
-redImage.height = 648;
-
 const cursorImage = new Image("Source/Elevator/mouse.png");
 cursorImage.width = 16;
 cursorImage.height = 16;
 
+const cursor2Image = new Image("Source/Elevator/mouse.png");
+cursor2Image.width = 16;
+cursor2Image.height = 16;
+
+
+const elevatorFrames = [];
+for (let i = 1; i <= 10; i++) {
+    const frame = new Image(`Source/Elevator/Elevator/${i}.png`);
+    frame.width = 740;
+    frame.height = 548;
+    elevatorFrames.push(frame);
+}
+
+const redImage = new Image("Source/Elevator/Elevator/red.png");
+redImage.width = 740;
+redImage.height = 548;
+
 const backgroundImage = new Image("Source/Elevator/Elevator Ending/last.png");
-backgroundImage.width = 840;
-backgroundImage.height = 648;
+backgroundImage.width = 740;
+backgroundImage.height = 548;
 
 const newSequenceFrames = [];
 for (let i = 1; i <= 11; i++) {
     const frame = new Image(`Source/Elevator/Elevator Ending/${i}.png`);
-    frame.width = 840;
-    frame.height = 648;
+    frame.width = 740;
+    frame.height = 548;
     newSequenceFrames.push(frame);
 }
 
 let currentFrame = 0;
 const frameDelay = 30;
 let lastFrameTime = Date.now();
-let animationState = "elevator"; 
+let animationState = "elevator";
 let animationStartTime = Date.now();
 let sequenceFrame = 0;
 
@@ -51,21 +54,20 @@ let redDuration = 0;
 const targetRect = { x: 495, y: 220, width: 15, height: 40 };
 const secondTargetRect = { x: 320, y: 350, width: 70, height: 50 };
 
-
 const movingBackgroundImages = [];
-const movingImageSpeed = 1; 
+const movingImageSpeed = 1;
 
 function clampCursorPosition() {
-    cursor.x = Math.max(0, Math.min(cursor.x, 840));
-    cursor.y = Math.max(0, Math.min(cursor.y, 648));
+    cursor.x = Math.max(0, Math.min(cursor.x, 740));
+    cursor.y = Math.max(0, Math.min(cursor.y, 548));
 }
 
 function applyShake() {
     shakeX = Math.random() * shakeIntensity * 2 - shakeIntensity;
     shakeY = Math.random() * shakeIntensity * 2 - shakeIntensity;
 
-    shakeX = Math.max(-camera.x, Math.min(shakeX, 840 - screenWidth - camera.x));
-    shakeY = Math.max(-camera.y, Math.min(shakeY, 648 - screenHeight - camera.y));
+    shakeX = Math.max(-camera.x, Math.min(shakeX, 740 - screenWidth - camera.x));
+    shakeY = Math.max(-camera.y, Math.min(shakeY, 548 - screenHeight - camera.y));
 }
 
 function isCursorInRect(rect) {
@@ -89,9 +91,12 @@ function randomizeRedAppearance() {
 
 function addBackgroundImage() {
     const randomImage = new Image("Source/Elevator/bg.png");
-    randomImage.y = 648;
+    randomImage.y = 548;
     movingBackgroundImages.push(randomImage);
 }
+
+const overlay = new Image("Source/Main Hub/Baby Room/overlay.png");
+
 
 Screen.display(() => {
     const pad = Pads.get(0);
@@ -105,27 +110,23 @@ Screen.display(() => {
 
     clampCursorPosition();
 
-    camera.x = Math.max(0, Math.min(cursor.x - screenWidth / 2, 840 - screenWidth));
-    camera.y = Math.max(0, Math.min(cursor.y - screenHeight / 2, 648 - screenHeight));
+    camera.x = Math.max(0, Math.min(cursor.x - screenWidth / 2, 740 - screenWidth));
+    camera.y = Math.max(0, Math.min(cursor.y - screenHeight / 2, 548 - screenHeight));
 
     const elapsedTime = Date.now() - animationStartTime;
-
 
     if (animationState === "elevator") {
         applyShake();
         randomizeRedAppearance();
 
-       
         if (Math.random() < 0.02) {
             addBackgroundImage();
         }
 
-
         for (let i = 0; i < movingBackgroundImages.length; i++) {
             const img = movingBackgroundImages[i];
             img.y -= movingImageSpeed;
-            img.draw(-camera.x + shakeX, img.y - camera.y); 
-
+            img.draw(-camera.x + shakeX, img.y - camera.y);
 
             if (img.y < -548) {
                 movingBackgroundImages.splice(i, 1);
@@ -147,12 +148,12 @@ Screen.display(() => {
 
         if (elapsedTime >= 82000) {
             animationState = "red";
-            shakeIntensity = 0; 
+            shakeIntensity = 0;
         }
     } else if (animationState === "red") {
         redImage.draw(-camera.x, -camera.y);
 
-        if ((pad.justPressed() && isCursorInRect(targetRect)) || (pad.btns & Pads.CROSS)) {
+        if (isCursorInRect(targetRect) && pad.btns & Pads.CROSS) {
             animationState = "sequence";
             sequenceFrame = 0;
         }
@@ -168,16 +169,26 @@ Screen.display(() => {
         newSequenceFrames[sequenceFrame].draw(-camera.x, -camera.y);
 
         if (sequenceFrame === newSequenceFrames.length - 1) {
-            animationState = "consoleAction"; 
+            animationState = "consoleAction";
         }
     } else if (animationState === "consoleAction") {
         backgroundImage.draw(-camera.x, -camera.y);
         newSequenceFrames[newSequenceFrames.length - 1].draw(-camera.x, -camera.y);
 
-        if ((pad.justPressed() && isCursorInRect(secondTargetRect)) || (pad.btns & Pads.CROSS)) {
-            std.reload("Source/Scripts/Elevator.js") 
+        if (isCursorInRect(secondTargetRect) && pad.btns & Pads.CROSS) {
+            std.reload("Source/Scripts/Elevator.js");
         }
     }
 
-    cursorImage.draw(cursor.x - camera.x - cursorImage.width / 2, cursor.y - camera.y - cursorImage.height / 2);
+    if (isCursorInRect(targetRect) || isCursorInRect(secondTargetRect)) {
+        cursor2Image.draw(cursor.x - camera.x - cursorImage.width / 2, cursor.y - camera.y - cursorImage.height / 2);
+    } else {
+        cursorImage.draw(cursor.x - camera.x - cursorImage.width / 2, cursor.y - camera.y - cursorImage.height / 2);
+    }
+
+    overlay.color = Color.new(255, 255, 255, 20);
+    overlay.draw(0, 0);
+    
+
+
 });

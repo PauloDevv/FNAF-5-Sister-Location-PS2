@@ -1,1 +1,1 @@
-std.reload("Source/Scripts/introduction.js")
+std.loadScript("Source/Scripts/babyroom.js")
